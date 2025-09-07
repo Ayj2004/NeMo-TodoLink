@@ -1,8 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# NVIDIA NeMo Agent Toolkit 黑客松配置
-# 支持用户自定义OpenAI兼容API
+# NVIDIA NeMo Agent Toolkit 配置（支持文件关联功能）
 
 general:
   use_uvloop: true
@@ -10,18 +9,30 @@ general:
 functions:
   internet_search:
     _type: tavily_internet_search
-    description: "使用Tavily API进行实时网络搜索"
-  
+    description: "使用Tavily API进行实时网络搜索，获取最新信息（如天气、新闻、事件等）"
+
   current_datetime:
     _type: current_datetime
-    description: "获取当前日期和时间"
+    description: "获取当前日期和时间，格式为YYYY-MM-DD HH:MM:SS，用于时间相关校验"
+
+  todo_manager:
+    _type: todo_manager
+    description: |
+      管理本地待办事项，支持5种操作：
+      - add_todo：添加待办（需提供content，可选category/priority/due_date/file_attachment）
+        * file_attachment：本地文件路径（如./docs/report.pdf，会自动验证存在性）
+      - query_todos：查看待办（可按status/category筛选，显示关联文件）
+      - update_todo：更新待办（需提供index和updates，支持更新file_attachment）
+      - delete_todo：删除待办（需提供index）
+      - stats：生成统计报告（含完成率、分类占比、文件关联数量）
+    data_path: "todo_data.json"
+    reminder: true
 
 llms:
-  # 默认使用Bailian API (用户可修改)
   default_llm:
     _type: openai
     model_name: "qwen-plus"
-    api_key: "Your API Key"
+    api_key: "your_api" # 替换为有效API密钥
     base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
     temperature: 0.7
     max_tokens: 2048
@@ -31,8 +42,8 @@ workflow:
   tool_names:
     - internet_search
     - current_datetime
+    - todo_manager
   llm_name: default_llm
   verbose: true
   parse_agent_response_max_retries: 3
-  max_iterations: 10
-
+  max_iterations: 15
