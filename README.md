@@ -1,273 +1,243 @@
-# NVIDIA NeMo Agent Toolkit AI对话机器人
+# NVIDIA NeMo 智能待办管家（File-Linked 增强版）
 
-> 🏆 **黑客松项目** - 基于NVIDIA官方NeMo Agent Toolkit构建的智能对话机器人，展示AI Agent的强大功能
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![NVIDIA NeMo](https://img.shields.io/badge/Powered%20by-NVIDIA%20NeMo-orange.svg)](https://developer.nvidia.com/nemo)
 
-![AI对话机器人界面](docs/ui_screenshot.png)
+## 一、项目简介
 
-## 🎯 项目简介
+基于 **NVIDIA NeMo Agent Toolkit** 开发的智能待办管理系统，核心解决个人/团队任务管理中“任务与关联资料脱节”的痛点，支持**任务分类、优先级管理、本地文件深度关联、过期提醒**等功能，并提供可视化前端界面，实现“任务-文件-统计”全流程闭环管理。
 
-本项目是为推广NVIDIA NeMo Agent Toolkit而开发的AI对话机器人示例，完全基于NVIDIA官方技术栈构建。系统集成了实时网络搜索、时间查询等功能，支持用户自定义OpenAI兼容的API接口，是学习和体验AI Agent技术的完美起点。
+### 核心亮点
 
-### ✨ 核心特性
+1. **NVIDIA 技术深度集成**：基于 NeMo Agent Toolkit 的 React 工作流与工具注册机制，确保功能扩展性与兼容性；
+2. **文件关联增强**：添加待办时自动验证本地文件有效性，存储绝对路径避免失效，支持文件关联的全生命周期管理；
+3. **前后端可视化交互**：前端基于 React/Vite 构建，提供直观的任务操作界面，后端通过 NeMo Agent 暴露 API 实现高效交互；
+4. **智能统计与提醒**：集成 LLM 生成自然语言任务总结，自动提醒过期任务，降低管理成本。
 
-- 🤖 **官方架构**: 100%使用NVIDIA官方NeMo Agent Toolkit
-- 🌐 **实时搜索**: 集成Tavily API，支持实时网络搜索
-- ⏰ **时间查询**: 获取当前日期和时间信息
-- 🔧 **灵活配置**: 支持任何OpenAI兼容的API接口
-- 🎨 **现代界面**: 官方UI，支持实时对话和流式响应
-- 🚀 **一键部署**: 跨平台安装脚本，支持Windows/Linux/macOS
+## 二、项目结构
 
-## 🏗️ 技术架构
+项目根目录为 `hackathon_aiqtoolkit`，关键目录与文件如下（仅展示核心路径）：
 
-### 前端
-- **框架**: Next.js 14 + TypeScript
-- **UI库**: 官方[NeMo-Agent-Toolkit-UI](https://github.com/NVIDIA/NeMo-Agent-Toolkit-UI)
-- **特性**: 实时聊天、主题切换、历史记录
-
-### 后端
-- **核心**: [NVIDIA NeMo Agent Toolkit (AIQ)](https://github.com/NVIDIA/NeMo-Agent-Toolkit/tree/develop)
-- **工作流**: React Agent
-- **工具**: Tavily搜索、时间查询
-
-### 模型支持
-- **默认**: Qwen模型
-- **兼容**: 任何OpenAI格式的API
-- **自定义**: 用户可配置API密钥、模型名称、base_url
-
-## 🚀 快速开始
-
-### 📋 环境要求
-
-- **Python**: 3.12+
-- **Node.js**: 18+
-- **Git**: 最新版本
-- **操作系统**: Windows 10+/macOS 10.15+/Ubuntu 20.04+
-
-### ⚡ 一键安装
-
-#### 克隆项目
-```bash
-git clone https://github.com/HeKun-NVIDIA/hackathon_aiqtoolkit.git
-cd hackathon_aiqtoolkit
 ```
-### 🔑 配置API密钥
-
-安装完成后，您需要配置以下API密钥：
-
-#### 1. Tavily搜索API密钥
-在`install.sh`文件中185行左右，将Your API Key替换成你自己的Tavily API Key 来保证搜索功能正常
-```bash
-# 设置环境变量
-export TAVILY_API_KEY=Your API Key
-```
-**获取Tavily API密钥**：
-1. 访问 [Tavily官网](https://tavily.com/)
-2. 注册账户并获取免费API密钥
-3. 将密钥添加到环境变量中
-
-#### 2. 大模型API密钥
-
-编辑 `install.sh` 文件中154行左右,将Your API Key替换成你自己的Bailian API Key：
-
-```yaml
-llms:
-  # 默认使用Bailian API (用户可修改)
-  default_llm:
-    _type: openai
-    model_name: "qwen-plus"
-    api_key: "Your API Key"
-    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    temperature: 0.7
-    max_tokens: 2048
+hackathon_aiqtoolkit/          # 项目根目录
+├─ configs/                    # 配置文件目录
+│  └─ hackathon_config.yml     # 核心配置（工具、LLM、端口等）
+├─ external/                   # 前端项目目录
+│  └─ aiqtoolkit-opensource-ui # 可视化前端（React+Vite）
+└─ NeMo-Agent-Toolkit/         # 后端核心（NVIDIA NeMo Agent）
+   ├─ src/
+   │  └─ nat/
+   │     └─ tool/              # 自定义工具实现
+   │        ├─ todo_manager.py # 待办管理工具（含文件关联）
+   │        └─ register.py     # 工具注册（接入NeMo生态）
+   └─ .venv/                   # Python虚拟环境（部署时创建）
 ```
 
-**支持的API提供商**：
-- **阿里云百炼平台Qwen系列**: `https://bailian.console.aliyun.com/?tab=model#/model-market`
-- **其他**: 任何OpenAI兼容的API
+## 三、环境准备
 
-#### Linux/macOS
-```bash
-# 运行安装脚本
-chmod +x install.sh
-./install.sh
-```
+### 3.1 后端环境（NeMo Agent）
 
-#### Windows
-```powershell
-# 运行安装脚本
-install.bat
-```
+- **Python 版本**：3.9 ~ 3.11（需匹配 NeMo Agent Toolkit 要求）
+- **包管理器**：`uv`（高性能 Python 包管理器，推荐优先使用）
+- **依赖来源**：项目内置依赖清单（通过`uv sync`自动安装）
 
+### 3.2 前端环境（可视化界面）
 
+- **Node.js 版本**：16.x ~ 20.x（LTS 版本最佳）
+- **包管理器**：`npm`（Node.js 自带）或`yarn`
 
-### 🎮 启动系统
+## 四、快速部署
+
+部署分为「后端服务启动」和「前端界面启动」两步，需分别在对应目录执行命令。
+
+### 4.1 步骤 1：部署后端（NeMo Agent 服务）
+
+#### 1.1 进入后端目录
+
+打开终端，切换到`NeMo-Agent-Toolkit`目录（需替换为你的实际项目路径）：
 
 ```bash
-# 启动服务
-cd NeMo-Agent-Toolkit
-./start.sh
+# Windows示例（假设项目在D盘）
+cd D:\hackathon_aiqtoolkit\NeMo-Agent-Toolkit
 
-# 停止服务
-./stop.sh
+# Linux/macOS示例（假设项目在用户目录）
+cd ~/hackathon_aiqtoolkit/NeMo-Agent-Toolkit
 ```
 
-### 🌐 访问地址
+#### 1.2 创建并激活虚拟环境
 
-- **前端界面**: http://localhost:3000
-- **API文档**: http://localhost:8001/docs
-- **健康检查**: http://localhost:8001/health
-
-## 🧪 功能测试
-
-### 网络搜索测试
-```
-用户: 北京今天的天气怎么样，气温是多少？
-AI: 今天北京天气晴朗，气温在18℃至31℃之间，当前温度约30℃，西南风3级，相对湿度43%，空气质量良好，体感温度舒适。白天最高气温可达31℃，夜间最低18℃，全天无降水，紫外线较强，建议做好防晒措施。
-```
-
-### 时间查询测试
-```
-用户: 现在几点了？
-AI: 现在是晚上11点17分。
-```
-
-### 公司信息搜索测试
-```
-用户: 帮我介绍一下NVIDIA Agent Intelligence Toolkit
-AI: [搜索并介绍NVIDIA AIQ工具包的详细信息]
-```
-
-## 📁 项目结构
-
-```
-nvidia-nemo-agent-toolkit-hackathon/
-├── configs/                    # 配置文件
-│   └── hackathon_config.yml   # 主配置文件
-├── external/                   # 外部模块
-│   └── aiqtoolkit-opensource-ui/  # 官方UI
-├── docs/                       # 文档和截图
-│   └── ui_screenshot.png      # 界面截图
-├── src/                        # 源代码
-├── install.sh                  # Linux/macOS安装脚本
-├── install.bat                 # Windows安装脚本
-├── start.sh                    # 启动脚本
-├── stop.sh                     # 停止脚本
-└── README.md                   # 说明文档
-```
-
-## ⚙️ 高级配置
-
-### 自定义工具
-
-在配置文件中添加新工具：
-
-```yaml
-functions:
-  your_custom_tool:
-    _type: your_tool_type
-    description: "工具描述"
-    # 其他配置参数
-```
-
-### 自定义工作流
-
-```yaml
-workflow:
-  _type: react_agent
-  tool_names:
-    - internet_search
-    - current_datetime
-    - your_custom_tool
-  llm_name: default_llm
-  verbose: true
-```
-
-### 调试模式
+使用`uv`创建名为`.venv`的虚拟环境，避免依赖冲突：
 
 ```bash
-# 启用详细日志
-aiq serve --config_file configs/hackathon_config.yml --verbose
+# 1. 创建虚拟环境
+uv venv
+
+# 2. 激活虚拟环境
+# Windows系统
+.venv\Scripts\activate
+# Linux/macOS系统
+source .venv/bin/activate
 ```
 
-## 🐛 故障排除
+激活成功后，终端前缀会显示`(.venv)`。
 
-### 常见问题
+#### 1.3 安装后端依赖
 
-#### 1. 端口占用
-```bash
-# 检查端口占用
-netstat -tlnp | grep :8001
-
-# 使用不同端口
-aiq serve --port 8002
-```
-
-#### 2. API密钥错误
-- 检查 `configs/hackathon_config.yml` 中的API密钥配置
-- 确认环境变量 `TAVILY_API_KEY` 已正确设置
-- 验证API密钥的有效性和权限
-
-#### 3. 依赖安装失败
-```bash
-# 清理缓存重新安装
-uv cache clean
-uv pip install -e . --force-reinstall
-```
-
-#### 4. 前端无法连接后端
-- 检查后端是否正常启动（访问 http://localhost:8001/health）
-- 确认端口配置正确
-- 检查防火墙设置
-
-### 日志查看
+通过`uv sync`安装所有依赖（含 NeMo Agent 核心包、待办工具依赖等）：
 
 ```bash
-# 查看后端日志
-tail -f logs/aiq.log
-
-# 查看前端日志
-cd external/aiqtoolkit-opensource-ui
-npm run dev -- --verbose
+uv sync --all-groups --all-extras
 ```
 
-## 📚 相关资源
+- `--all-groups`：安装所有依赖组（工具、LLM、服务等）
+- `--all-extras`：安装包的额外功能（确保文件关联、统计等功能正常）
 
-### 官方文档
-- [NVIDIA NeMo Agent Toolkit](https://github.com/NVIDIA/NeMo-Agent-Toolkit)
-- [官方文档](https://docs.nvidia.com/nemo-agent-toolkit/)
-- [NeMo Agent Toolkit UI](https://github.com/NVIDIA/NeMo-Agent-Toolkit-UI)
+#### 1.4 启动后端服务
 
-### API文档
-- [Tavily API文档](https://docs.tavily.com/)
-- [阿里云百炼平台](https://bailian.console.aliyun.com/?tab=doc#/doc)
-- [OpenAI API文档](https://platform.openai.com/docs/)
+加载配置文件并启动 API 服务，绑定`0.0.0.0:8001`（支持局域网访问）：
 
-### 学习资源
-- [AI Agent开发指南](https://docs.nvidia.com/nemo-agent-toolkit/user-guide/)
-- [React Agent工作流](https://docs.nvidia.com/nemo-agent-toolkit/workflows/react-agent/)
-- [MCP协议文档](https://docs.nvidia.com/nemo-agent-toolkit/mcp/)
+```bash
+nat serve --config_file ../configs/hackathon_config.yml --host 0.0.0.0 --port 8001
+```
 
-## 🏆 黑客松信息
+**后端启动成功标志**：
+终端显示类似以下日志，说明服务已就绪：
 
-本项目专为推广NVIDIA NeMo Agent Toolkit技术而开发，旨在：
+```
+2024-XX-XX XX:XX:XX INFO     Starting NeMo Agent server on 0.0.0.0:8001
+2024-XX-XX XX:XX:XX INFO     Loaded tools: ['internet_search', 'current_datetime', 'todo_manager']
+2024-XX-XX XX:XX:XX INFO     Server ready to handle requests
+```
 
-- 🎯 **展示AI Agent能力**: 通过实际应用展示NVIDIA NeMo Agent Toolkit的强大功能
-- 🚀 **降低学习门槛**: 提供完整的示例代码和详细文档，帮助开发者快速上手
-- 🌟 **促进技术交流**: 为AI Agent技术爱好者提供学习和交流的平台
-- 💡 **激发创新思维**: 鼓励开发者基于此项目创建更多创新应用
+### 4.2 步骤 2：部署前端（可视化界面）
 
-### 技术亮点
+#### 2.1 进入前端目录
 
-- ✅ **完全官方架构**: 严格遵循NVIDIA官方技术规范
-- ✅ **生产级质量**: 包含完整的错误处理、日志记录和监控
-- ✅ **易于扩展**: 模块化设计，支持快速添加新功能
-- ✅ **跨平台支持**: 一套代码，多平台运行
+打开**新终端**（避免与后端终端冲突），切换到前端目录：
 
+```bash
+# Windows示例
+cd D:\hackathon_aiqtoolkit\external\aiqtoolkit-opensource-ui
 
+# Linux/macOS示例
+cd ~/hackathon_aiqtoolkit/external/aiqtoolkit-opensource-ui
+```
 
----
+#### 2.2 安装前端依赖（首次启动需执行）
 
-**🎯 让我们一起探索AI Agent的无限可能！**
+```bash
+npm install
+```
 
-> 本项目展示了NVIDIA NeMo Agent Toolkit在实际应用中的强大能力，为AI Agent技术的普及和发展贡献力量。无论您是AI初学者还是资深开发者，都能从这个项目中获得有价值的学习体验。
+- 若出现依赖冲突，可尝试强制安装：`npm install --force`
+- 若速度较慢，可切换 npm 镜像：`npm config set registry https://registry.npm.taobao.org`
 
+#### 2.3 启动前端服务
+
+```bash
+npm run dev
+```
+
+**前端启动成功标志**：
+终端显示类似以下日志，可通过浏览器访问：
+
+```
+VITE v4.5.0 ready in 350 ms
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.100:5173/
+  ➜  press h to show help
+```
+
+### 4.3 步骤 3：验证前后端联调
+
+1. 打开浏览器，访问前端地址：`http://localhost:5173`
+2. 在前端界面尝试「添加待办」「关联本地文件」等操作
+3. 观察后端终端：若显示`Received request for tool: todo_manager`等日志，且前端正常返回结果，说明联调成功。
+
+## 五、核心功能使用
+
+### 5.1 基础待办管理
+
+| 功能     | 操作路径（前端）                | 说明                                                             |
+| -------- | ------------------------------- | ---------------------------------------------------------------- |
+| 添加待办 | 首页 → 「添加待办」按钮         | 填写内容、选择分类（work/life/study）、优先级（high/medium/low） |
+| 查询待办 | 首页 → 筛选栏（状态/分类）      | 支持按“未完成/已完成”状态、分类筛选                              |
+| 更新待办 | 待办列表 → 目标任务「编辑」按钮 | 修改状态、内容、优先级等                                         |
+| 删除待办 | 待办列表 → 目标任务「删除」按钮 | 删除后自动更新剩余任务索引                                       |
+| 任务统计 | 首页 → 「统计报告」标签页       | 查看完成率、分类占比、文件关联数                                 |
+
+### 5.2 文件关联功能（核心增强）
+
+1. **添加文件关联**：
+   - 添加待办时，点击「关联文件」按钮，选择本地文件（如 PDF、TXT）
+   - 系统自动验证文件有效性，存储绝对路径（避免路径失效）
+2. **查看文件关联**：
+   - 待办列表中，带文件关联的任务会显示「文件图标」，hover 可查看路径
+3. **更新/移除文件**：
+   - 编辑待办时，重新选择文件（更新）或清空文件路径（移除）
+
+### 5.3 智能提醒与统计
+
+- **过期提醒**：首页顶部会显示过期任务警告，点击可快速定位
+- **LLM 统计总结**：「统计报告」页会生成自然语言总结（如“您有 3 个待办，2 个关联了本地文件，建议优先处理高优先级工作任务”）
+
+## 六、技术栈
+
+### 6.1 NVIDIA 相关技术
+
+- **NVIDIA NeMo Agent Toolkit**：后端核心框架，提供工具注册、LLM 适配、工作流调度
+- **NeMo Function Registration**：实现`todo_manager`工具标准化接入
+- **SPDX 规范**：代码版权与许可证管理（Apache-2.0）
+
+### 6.2 后端技术
+
+- Python 3.9+、uv（包管理）
+- Pydantic（数据模型校验）
+- FastAPI（NeMo Agent 内置 API 服务）
+
+### 6.3 前端技术
+
+- React（UI 框架）、Vite（构建工具）
+- Axios（前后端接口请求）
+- 响应式设计（支持 PC/平板端）
+
+## 七、常见问题（FAQ）
+
+### Q1：后端启动时提示“uv: 命令不存在”？
+
+A1：需先安装`uv`包管理器：
+
+```bash
+pip install uv
+```
+
+### Q2：前端启动后无法连接后端？
+
+A2：
+
+1. 检查后端服务是否已启动（端口 8001 是否占用）
+2. 确认前端配置的后端地址正确（通常在`src/api/config.js`中，需与后端`--host`和`--port`匹配）
+
+### Q3：添加文件关联时提示“文件不存在”？
+
+A3：
+
+1. 确认选择的文件未被删除或移动
+2. 若文件路径含中文/特殊字符，建议重命名后重试
+
+### Q4：端口冲突怎么办？
+
+A4：
+
+- 后端：修改启动命令的`--port`参数（如`--port 8002`）
+- 前端：修改`package.json`中`dev`脚本的端口（如`vite --port 5174`），并同步更新前端后端地址配置
+
+## 八、版权声明
+
+本项目基于 **Apache License 2.0** 协议开源，版权归 NVIDIA CORPORATION & AFFILIATES 及项目开发者所有。
+
+- 允许非商业用途的修改、分发与使用
+- 商业用途需联系 NVIDIA 获取授权
+- 使用时需保留原始版权声明与协议文本
+
+协议详情：[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
